@@ -1,39 +1,47 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-function App() {
-  const [allPages, setAllPages] = useState(false)
-  const [pages, setPages] = useState([
-    { id: 1, selected: false, title: 'Page 1' },
-    { id: 2, selected: false, title: 'Page 2' },
-    { id: 3, selected: false, title: 'Page 3' },
-    { id: 4, selected: false, title: 'Page 4' },
-    { id: 5, selected: false, title: 'Page 5' },
-    { id: 6, selected: false, title: 'Page 6' },
-  ])
-  const handleAllPages = () => {
-    const newAllPages = !allPages
-    setAllPages(newAllPages)
-    setPages(pages.map(page => ({ ...page, selected: newAllPages })))
-  }
+type Page = {
+  title: string;
+  isChecked: boolean;
+};
 
-  const handlePage = (id: number) => {
-    const newPages = pages.map(page => 
-      page.id === id ? { ...page, selected: !page.selected } : page
-    )
-    setPages(newPages)
-    setAllPages(newPages.every(page => page.selected))
-  }
+export default function App() {
+  const [pages, setPages] = useState<Page[]>([
+    { title: "Page 1", isChecked: false },
+    { title: "Page 2", isChecked: false },
+    { title: "Page 3", isChecked: false },
+    { title: "Page 4", isChecked: false },
+    { title: "Page 5", isChecked: false },
+    { title: "Page 6", isChecked: false },
+  ]);
+
+  const [allChecked, setAllChecked] = useState(false);
+
+  const handleAllChecked = () => {
+    const newCheckedState = !allChecked;
+    setAllChecked(newCheckedState);
+    setPages(pages.map((page) => ({ ...page, isChecked: newCheckedState })));
+  };
+
+  const handleIndividualChecked = (index: number) => {
+    const updatedPages = [...pages];
+    updatedPages[index].isChecked = !updatedPages[index].isChecked;
+    setPages(updatedPages);
+
+    const allAreChecked = updatedPages.every((page) => page.isChecked);
+    setAllChecked(allAreChecked);
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-6">
-      <div className="h-[326px] w-[370px] rounded-[6px] border border-[#eeeeee] bg-white px-0 py-[10px] shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
+    <div className="flex h-screen w-full items-center justify-center bg-white">
+      <div className="h-[326px] w-[370px] rounded-[6px] border border-[#eeeeee] bg-white py-[10px] shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
         <div className="flex h-[42px] w-full items-center justify-between bg-white px-[15px] py-[8px]">
-          <span className="text-[15px] font-normal text-[#2d2d2d]">All pages</span>
+          <span className="text-sm text-[#2d2d2d]">All pages</span>
           <label className="relative inline-flex h-[25px] w-[25px] cursor-pointer items-center justify-center">
             <input
               type="checkbox"
-              checked={allPages}
-              onChange={handleAllPages}
+              checked={allChecked}
+              onChange={handleAllChecked}
               className="peer relative z-0 h-[25px] w-[25px] appearance-none rounded-[6px] border border-[#d9d9d9] bg-white transition-colors duration-150 hover:border-[#c8c8c8] checked:border-[#1a68ff] checked:bg-[#1a68ff]"
             />
             <span className="pointer-events-none absolute left-0 top-0 z-10 h-[25px] w-[25px] opacity-0 transition-opacity duration-150 peer-checked:opacity-100">
@@ -44,18 +52,18 @@ function App() {
 
         <div className="my-[8px] border-t border-[#e5e5e5] mx-[15px]" />
 
-        <div className="max-h-[168px] overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {pages.map(page => (
+        <div className="max-h-[164px] overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {pages.map((page, index) => (
             <div
-              key={page.id}
+              key={index}
               className="flex h-[42px] w-full items-center justify-between bg-white px-[15px] py-[8px]"
             >
-              <span className="text-[15px] font-normal text-[#2d2d2d]">{page.title}</span>
+              <span className="text-sm text-[#2d2d2d]">{page.title}</span>
               <label className="relative inline-flex h-[25px] w-[25px] cursor-pointer items-center justify-center">
                 <input
                   type="checkbox"
-                  checked={page.selected}
-                  onChange={() => handlePage(page.id)}
+                  checked={page.isChecked}
+                  onChange={() => handleIndividualChecked(index)}
                   className="peer relative z-0 h-[25px] w-[25px] appearance-none rounded-[6px] border border-[#d9d9d9] bg-white transition-colors duration-150 hover:border-[#c8c8c8] checked:border-[#1a68ff] checked:bg-[#1a68ff]"
                 />
                 <span className="pointer-events-none absolute left-0 top-0 z-10 h-[25px] w-[25px] opacity-0 transition-opacity duration-150 peer-checked:opacity-100">
@@ -68,15 +76,10 @@ function App() {
 
         <div className="my-[8px] border-t border-[#e5e5e5] mx-[15px]" />
 
-        <button
-          type="button"
-          className="mx-auto mt-4 flex h-[40px] w-[340px] items-center justify-center gap-[10px] rounded-[4px] bg-[#ffce22] px-[20px] py-[10px] text-[15px] font-medium text-[#1a1a1a] shadow-[0_2px_0_rgba(0,0,0,0.08)] transition duration-150 hover:bg-[#ffd84d] active:translate-y-[1px]"
-        >
+        <button className="mx-auto mt-3 flex h-[40px] w-[340px] items-center justify-center rounded-[4px] bg-[#ffce22] text-sm font-medium text-[#1a1a1a] transition duration-150 hover:bg-[#ffd84d]">
           Done
         </button>
       </div>
     </div>
-  )
+  );
 }
-
-export default App
